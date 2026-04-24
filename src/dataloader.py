@@ -49,17 +49,17 @@ def get_dataloader(name: str = "swiss_roll", dim: int = 2, batch_size: int = 102
 
 import matplotlib.pyplot as plt
 
-dl = get_dataloader(name="swiss_roll", dim=2, batch_size=8192)
-points = next(iter(dl))  # shape: (8192, 2)
+# dl = get_dataloader(name="circles", dim=2, batch_size=8192)
+# points = next(iter(dl))  # shape: (8192, 2)
 
-points_2d = points.numpy()  # convert to numpy for matplotlib
+# points_2d = points.numpy()  # convert to numpy for matplotlib
 
-# ds = ToyDiffusionDataset(name="swiss_roll", dim=32)
-# loader = DataLoader(ds, batch_size=8192, shuffle=False)
+ds = ToyDiffusionDataset(name="gaussians", dim=32)
+loader = DataLoader(ds, batch_size=8192, shuffle=False)
 
-# points_32d = next(iter(loader)).numpy()  # (8192, 32)
-# points_2d = ds.to_2d(points_32d)         # (8192, 2) via P.T
+points_32d = next(iter(loader)).numpy()  # (8192, 32)
+points_2d = ds.to_2d(points_32d)         # (8192, 2) via P.T
 
 plt.scatter(points_2d[:, 0], points_2d[:, 1], s=1, alpha=0.5)
-plt.title("Swiss Roll 2d")
+plt.title("Gaussians 32d")
 plt.show()
