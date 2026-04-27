@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from pathlib import Path
+import wandb
 
 from model import Denoiser
 from dataloader import get_dataloader
@@ -16,6 +17,18 @@ def train(
     log_every: int = 500,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ):
+    # Initialize Weights & Biases for logging
+    wandb.init(
+        project="flow-matching",
+        config={
+            "dataset": dataset_name,
+            "dim": dim,
+            "n_steps": n_steps,
+            "batch_size": batch_size,
+            "lr": lr,
+        }
+    )
+
     # Data
     loader = get_dataloader(name=dataset_name, dim=dim,
                             batch_size=batch_size)
@@ -25,6 +38,9 @@ def train(
     model = Denoiser(dim).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     mse = nn.MSELoss()
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_steps, eta_min=0.1*lr)
+
+    running_loss = 0.0
 
     model.train()
     for step in range(1, n_steps + 1):
@@ -50,10 +66,19 @@ def train(
 
         optimizer.zero_grad()
         loss.backward()
+        running_loss += loss.item()
         optimizer.step()
+        scheduler.step()
 
         if step % log_every == 0:
-            print(f"step {step:>6} / {n_steps} | loss {loss.item():.4f}")
+            avg_loss = running_loss / log_every
+            wandb.log({
+                "loss": avg_loss, 
+                "lr": scheduler.get_last_lr()[0], 
+                "step": step,
+            })
+            print(f"step {step:>6} / {n_steps} | loss {avg_loss:.4f}")
+            running_loss = 0.0
 
     torch.save(model.state_dict(), "denoiser.pt")
     print("Model saved to denoiser.pt")

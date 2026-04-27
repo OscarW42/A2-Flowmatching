@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.11.15",
+  "startedAt":  "2026-04-27T05:55:49.632749Z",
+  "program":  "c:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching\\src\\train.py",
+  "codePath":  "src\\train.py",
+  "codePathLocal":  "src\\train.py",
+  "git":  {
+    "remote":  "https://github.com/OscarW42/A2-Flowmatching.git",
+    "commit":  "d710aad0e8d13f65f04a6a2732b2b39bed1ef3aa"
+  },
+  "email":  "oscar.bboc@gmail.com",
+  "root":  "C:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching",
+  "host":  "Oscar_laptop",
+  "executable":  "C:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching\\.venv\\Scripts\\python.exe",
+  "cpu_count":  8,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "1021821579264",
+      "used":  "159023370240"
+    }
+  },
+  "memory":  {
+    "total":  "33897037824"
+  },
+  "writerId":  "0suf49ap6gr0642ohgmlri53fiqkrl2f"
+}
