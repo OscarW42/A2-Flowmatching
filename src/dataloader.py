@@ -47,19 +47,21 @@ def get_dataloader(name: str = "swiss_roll", dim: int = 2, batch_size: int = 102
     ds = ToyDiffusionDataset(name=name, dim=dim, data_dir=data_dir)
     return DataLoader(ds, batch_size=batch_size, shuffle=shuffle, drop_last=False)
 
-import matplotlib.pyplot as plt
+if __name__ == "__main__":
 
-# dl = get_dataloader(name="circles", dim=2, batch_size=8192)
-# points = next(iter(dl))  # shape: (8192, 2)
+    import matplotlib.pyplot as plt
 
-# points_2d = points.numpy()  # convert to numpy for matplotlib
+    # dl = get_dataloader(name="circles", dim=2, batch_size=8192)
+    # points = next(iter(dl))  # shape: (8192, 2)
 
-ds = ToyDiffusionDataset(name="gaussians", dim=32)
-loader = DataLoader(ds, batch_size=8192, shuffle=False)
+    # points_2d = points.numpy()  # convert to numpy for matplotlib
 
-points_32d = next(iter(loader)).numpy()  # (8192, 32)
-points_2d = ds.to_2d(points_32d)         # (8192, 2) via P.T
+    ds = ToyDiffusionDataset(name="gaussians", dim=32)
+    loader = DataLoader(ds, batch_size=8192, shuffle=False)
 
-plt.scatter(points_2d[:, 0], points_2d[:, 1], s=1, alpha=0.5)
-plt.title("Gaussians 32d")
-plt.show()
+    points_32d = next(iter(loader)).numpy()  # (8192, 32)
+    points_2d = ds.to_2d(points_32d)         # (8192, 2) via P.T
+
+    plt.scatter(points_2d[:, 0], points_2d[:, 1], s=1, alpha=0.5)
+    plt.title("Gaussians 32d")
+    plt.show()

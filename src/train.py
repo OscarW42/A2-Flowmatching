@@ -9,7 +9,7 @@ from dataloader import get_dataloader
 def train(
     dataset_name: str = "swiss_roll",
     dim: int = 2,
-    data_dir: Path = Path("data"),
+    # data_dir: Path = Path("data"),
     n_steps: int = 25000,
     batch_size: int = 1024,
     lr: float = 1e-3,
@@ -38,10 +38,14 @@ def train(
         x = x.to(device)
 
         t = torch.rand(1).item()
-        epsilon = torch.randn_like(x)
-        z_t = (1 - t) * x + t * epsilon
+        t_tensor = torch.full((batch_size,), t).to(device)
+        t_expand = t_tensor.unsqueeze(-1) 
 
-        v_pred = model(z_t, torch.tensor([t]).to(device))
+        epsilon = torch.randn_like(x)
+
+        z_t = (1 - t_expand) * x + t_expand * epsilon
+
+        v_pred = model(z_t, t_tensor)
         loss = mse(v_pred, epsilon - x)
 
         optimizer.zero_grad()
@@ -55,3 +59,6 @@ def train(
     print("Model saved to denoiser.pt")
 
     return model
+
+if __name__ == "__main__":
+    model = train(dataset_name="circles", dim=2)
