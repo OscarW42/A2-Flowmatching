@@ -12,8 +12,10 @@ for dim in [2, 8, 32]:
                 ds = ToyDiffusionDataset(name=ds_name, dim=dim)
                 model = train(dataset_name=ds_name, dim=dim, pred_quantity=pred_quantity, loss_type=loss_type)
                 print(f"Sampling on {ds_name} with dim={dim}, pred_quantity={pred_quantity}, loss_type={loss_type}")
+                model.eval()
                 z = sample(model, pred_quantity, dim=dim).numpy()
-                z_2d = ds.to_2d(z)
-                plt.scatter(z_2d[:, 0], z_2d[:, 1], s=1, alpha=0.5)
+                if dim > 2:
+                    z = ds.to_2d(z)
+                plt.scatter(z[:, 0], z[:, 1], s=1, alpha=0.5)
                 plt.title(f"{ds_name} | {dim}D | {pred_quantity}-pred | {loss_type}-loss")
                 plt.savefig(f"results/{ds_name}_{dim}D_{pred_quantity}pred_{loss_type}loss.png")

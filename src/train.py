@@ -19,17 +19,17 @@ def train(
     log_every: int = 500,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ):
-    # Initialize Weights & Biases for logging
-    wandb.init(
-        project="flow-matching",
-        config={
-            "dataset": dataset_name,
-            "dim": dim,
-            "n_steps": n_steps,
-            "batch_size": batch_size,
-            "lr": lr,
-        }
-    )
+    # # Initialize Weights & Biases for logging
+    # wandb.init(
+    #     project="flow-matching",
+    #     config={
+    #         "dataset": dataset_name,
+    #         "dim": dim,
+    #         "n_steps": n_steps,
+    #         "batch_size": batch_size,
+    #         "lr": lr,
+    #     }
+    # )
 
     # Data
     loader = get_dataloader(name=dataset_name, dim=dim,
@@ -88,16 +88,16 @@ def train(
 
         if step % log_every == 0:
             avg_loss = running_loss / log_every
-            wandb.log({
-                "loss": avg_loss, 
-                "lr": scheduler.get_last_lr()[0], 
-                "step": step,
-            })
+            # wandb.log({
+            #     "loss": avg_loss, 
+            #     "lr": scheduler.get_last_lr()[0], 
+            #     "step": step,
+            # })
             print(f"step {step:>6} / {n_steps} | loss {avg_loss:.4f}")
             running_loss = 0.0
 
-    torch.save(model.state_dict(), "denoiser.pt")
-    print("Model saved to denoiser.pt")
+    # torch.save(model.state_dict(), "denoiser.pt")
+    # print("Model saved to denoiser.pt")
 
     return model
 
