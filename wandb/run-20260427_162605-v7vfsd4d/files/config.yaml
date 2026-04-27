@@ -1,0 +1,52 @@
+_wandb:
+    value:
+        cli_version: 0.26.1
+        e:
+            mqiln1itiz8ujqrdpeeena60sogk1x9r:
+                codePath: src\train.py
+                codePathLocal: src\train.py
+                cpu_count: 8
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "1021821579264"
+                        used: "159309750272"
+                email: oscar.bboc@gmail.com
+                executable: C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\.venv\Scripts\python.exe
+                git:
+                    commit: a4c976ea935a0967bbcc70c09a614e6b6f5ab9b4
+                    remote: https://github.com/OscarW42/A2-Flowmatching.git
+                host: Oscar_laptop
+                memory:
+                    total: "33897037824"
+                os: Windows-10-10.0.26200-SP0
+                program: c:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\src\train.py
+                python: CPython 3.11.15
+                root: C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching
+                startedAt: "2026-04-27T06:26:05.776049Z"
+                writerId: mqiln1itiz8ujqrdpeeena60sogk1x9r
+        m: []
+        python_version: 3.11.15
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 16
+            "4": 3.11.15
+            "5": 0.26.1
+            "8":
+                - 3
+            "12": 0.26.1
+            "13": windows-amd64
+batch_size:
+    value: 1024
+dataset:
+    value: gaussians
+dim:
+    value: 2
+lr:
+    value: 0.001
+n_steps:
+    value: 25000

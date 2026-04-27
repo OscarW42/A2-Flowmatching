@@ -9,6 +9,8 @@ from dataloader import get_dataloader
 # ── Training loop ─────────────────────────────────────────────────────────────
 def train(
     dataset_name: str = "swiss_roll",
+    pred_quantity: str = "v",  # "x" or "v"
+    loss_type: str = "v", # "x" or "v"
     dim: int = 2,
     # data_dir: Path = Path("data"),
     n_steps: int = 25000,
@@ -53,7 +55,10 @@ def train(
 
         x = x.to(device)
 
-        t = torch.rand(1).item()
+        if pred_quantity == "x" and loss_type == "v":
+            t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
+        else:
+            t = torch.rand(1).item()  # t in [0, 1]
         t_tensor = torch.full((batch_size,), t).to(device)
         t_expand = t_tensor.unsqueeze(-1) 
 
@@ -61,8 +66,19 @@ def train(
 
         z_t = (1 - t_expand) * x + t_expand * epsilon
 
-        v_pred = model(z_t, t_tensor)
-        loss = mse(v_pred, epsilon - x)
+        pred = model(z_t, t_tensor)
+        if pred_quantity == "v" and loss_type == "v":
+            loss = mse(pred, epsilon - x)
+        elif pred_quantity == "v" and loss_type == "x":
+            x_pred = z_t - t_expand * pred
+            loss = mse(x_pred, x)
+        elif pred_quantity == "x" and loss_type == "x":
+            loss = mse(pred, x)
+        elif pred_quantity == "x" and loss_type == "v":
+            v_pred = (z_t - pred) / t_expand
+            loss = mse(v_pred, epsilon - x)
+        else:
+            raise ValueError(f"Unknown combination of pred_quantity '{pred_quantity}' and loss_type '{loss_type}'. Choose 'x' or 'v' for both.")
 
         optimizer.zero_grad()
         loss.backward()
@@ -86,4 +102,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="circles", dim=2)
+    model = train(dataset_name="gaussians", pred_quantity="x", loss_type="v", dim=2)
