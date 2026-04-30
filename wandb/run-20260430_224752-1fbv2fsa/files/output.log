@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "c:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\src\train.py", line 111, in <module>
+    model = train(dataset_name="swiss_roll", pred_quantity="x", loss_type="x", dim=32)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\src\train.py", line 69, in train
+    t_expand = t.unsqueeze(-1)
+              ^^^^^^^^^^^
+AttributeError: 'float' object has no attribute 'unsqueeze'

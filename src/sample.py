@@ -23,10 +23,10 @@ def sample(model, pred_quantity, dim=2, n_steps=50, batch_size=8192):
 if __name__ == "__main__":
     dim = 32
     model = Denoiser(dim)
-    model.load_state_dict(torch.load("32d_denoiser.pt", map_location="cpu"))
+    model.load_state_dict(torch.load("denoiser.pt", map_location="cpu"))
     model.eval()  # switch off dropout/batchnorm training behaviour
     
-    z = sample(model, "v", dim=dim, n_steps=400).numpy()
+    z = sample(model, "x", dim=dim, n_steps=200).numpy()
     ds = ToyDiffusionDataset(name="gaussians", dim=dim)
     if dim > 2:
         z = ds.to_2d(z)

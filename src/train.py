@@ -44,7 +44,7 @@ def train(
     model = Denoiser(dim).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     mse = nn.MSELoss()
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_steps, eta_min=0.01*lr)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_steps, eta_min=0.1*lr)
 
     running_loss = 0.0
 
@@ -59,20 +59,20 @@ def train(
 
         x = x.to(device)
 
-        # if pred_quantity == "x" and loss_type == "v":
-        #     t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
-        # else:
-        #     t = torch.rand(1).item()  # t in [0, 1]
-        t = torch.rand(batch_size, device=device)
-        t_shifted = shift_t(t, base_dim=2, target_dim=dim)  # adjust t for higher dimensions
-        # t_tensor = torch.full((batch_size,), t).to(device)
-        t_expand = t.unsqueeze(-1) 
+        if pred_quantity == "x" and loss_type == "v":
+            t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
+        else:
+            t = torch.rand(1).item()  # t in [0, 1]
+        # t = torch.rand(batch_size, device=device)
+        # t_shifted = shift_t(t, base_dim=2, target_dim=dim)  # adjust t for higher dimensions
+        t_tensor = torch.full((batch_size,), t).to(device)
+        t_expand = t_tensor.unsqueeze(-1) 
 
         epsilon = torch.randn_like(x)
 
         z_t = (1 - t_expand) * x + t_expand * epsilon
 
-        pred = model(z_t, t_shifted)
+        pred = model(z_t, t_tensor)
         if pred_quantity == "v" and loss_type == "v":
             loss = mse(pred, epsilon - x)
         elif pred_quantity == "v" and loss_type == "x":
@@ -108,4 +108,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="swiss_roll", pred_quantity="v", loss_type="v", dim=32, n_steps=100000, lr=5e-4)
+    model = train(dataset_name="swiss_roll", pred_quantity="x", loss_type="x", dim=32)
