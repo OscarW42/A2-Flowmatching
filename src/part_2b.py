@@ -4,6 +4,9 @@ from dataloader import ToyDiffusionDataset
 from train import train
 from sample import sample
 
+import os
+os.makedirs("results", exist_ok=True)
+
 for dim in [2, 8, 32]:
     for ds_name in ["swiss_roll", "gaussians", "circles"]:
         for pred_quantity in ["x", "v"]:
@@ -19,3 +22,4 @@ for dim in [2, 8, 32]:
                 plt.scatter(z[:, 0], z[:, 1], s=1, alpha=0.5)
                 plt.title(f"{ds_name} | {dim}D | {pred_quantity}-pred | {loss_type}-loss")
                 plt.savefig(f"results/{ds_name}_{dim}D_{pred_quantity}pred_{loss_type}loss.png")
+                plt.close()
