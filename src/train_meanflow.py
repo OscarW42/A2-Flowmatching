@@ -3,20 +3,16 @@ import torch.nn as nn
 from pathlib import Path
 import wandb
 
-from model import Denoiser
+from meanflow_model import Denoiser
 from dataloader import get_dataloader
-
-def shift_t(t, base_dim=2, target_dim=32):
-    alpha = (target_dim / base_dim) ** 0.5
-    return alpha * t / (1 + (alpha - 1) * t)
 
 # ── Training loop ─────────────────────────────────────────────────────────────
 def train(
     dataset_name: str = "swiss_roll",
-    pred_quantity: str = "v",  # "x" or "v"
-    loss_type: str = "v", # "x" or "v"
+    # pred_quantity: str = "v",  # "x" or "v"
+    # loss_type: str = "v", # "x" or "v"
     dim: int = 2,
-    # data_dir: Path = Path("data"),
+    ratio_h: float = 0.5,
     n_steps: int = 25000,
     batch_size: int = 1024,
     lr: float = 1e-3,
@@ -59,32 +55,36 @@ def train(
 
         x = x.to(device)
 
-        if pred_quantity == "x" and loss_type == "v":
-            t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
+        t = torch.rand(1).item()
+        if torch.rand(1).item() < ratio_h:
+            r = torch.rand(1).item()
+            t, r = max(t, r), min(t, r)  # ensure t >= r
         else:
-            t = torch.rand(1).item()  # t in [0, 1]
-        # t = torch.rand(batch_size, device=device)
-        # t_shifted = shift_t(t, base_dim=2, target_dim=dim)  # adjust t for higher dimensions
-        t_tensor = torch.full((batch_size,), t).to(device)
-        t_expand = t_tensor.unsqueeze(-1) 
+            r = t
+        h = t-r
+
+        t_tensor = torch.full((batch_size,), t, device=device)
+        # r_tensor = torch.full((batch_size,), r, device=device)
+        h_tensor = torch.full((batch_size,), h, device=device)
+
+        t_expand = t_tensor.unsqueeze(-1)
+        h_expand = h_tensor.unsqueeze(-1)
 
         epsilon = torch.randn_like(x)
 
         z_t = (1 - t_expand) * x + t_expand * epsilon
+        v_t = epsilon - x
+        u, dudt = torch.func.jvp(
+            lambda z, t, h: model(z, t, h),
+            (z_t, t_tensor, h_tensor),
+            (v_t, torch.ones_like(t_tensor), torch.ones_like(h_tensor)),
+        )
 
-        pred = model(z_t, t_tensor)
-        if pred_quantity == "v" and loss_type == "v":
-            loss = mse(pred, epsilon - x)
-        elif pred_quantity == "v" and loss_type == "x":
-            x_pred = z_t - t_expand * pred
-            loss = mse(x_pred, x)
-        elif pred_quantity == "x" and loss_type == "x":
-            loss = mse(pred, x)
-        elif pred_quantity == "x" and loss_type == "v":
-            v_pred = (z_t - pred) / t_expand
-            loss = mse(v_pred, epsilon - x)
-        else:
-            raise ValueError(f"Unknown combination of pred_quantity '{pred_quantity}' and loss_type '{loss_type}'. Choose 'x' or 'v' for both.")
+        with torch.no_grad():
+            u_tgt = v_t - h_expand * dudt
+
+        error = u - u_tgt
+        loss = (error ** 2).mean()
 
         optimizer.zero_grad()
         loss.backward()
@@ -108,4 +108,17 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="swiss_roll", pred_quantity="x", loss_type="x", dim=2)
+    model = train(dataset_name="swiss_roll", dim=2)
+
+        # if pred_quantity == "v" and loss_type == "v":
+        #     loss = mse(pred, epsilon - x)
+        # elif pred_quantity == "v" and loss_type == "x":
+        #     x_pred = z_t - t_expand * pred
+        #     loss = mse(x_pred, x)
+        # elif pred_quantity == "x" and loss_type == "x":
+        #     loss = mse(pred, x)
+        # elif pred_quantity == "x" and loss_type == "v":
+        #     v_pred = (z_t - pred) / t_expand
+        #     loss = mse(v_pred, epsilon - x)
+        # else:
+        #     raise ValueError(f"Unknown combination of pred_quantity '{pred_quantity}' and loss_type '{loss_type}'. Choose 'x' or 'v' for both.")
