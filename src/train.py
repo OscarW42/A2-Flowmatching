@@ -17,23 +17,23 @@ def train(
     loss_type: str = "v", # "x" or "v"
     dim: int = 2,
     # data_dir: Path = Path("data"),
-    n_steps: int = 25000,
+    n_steps: int = 100000,
     batch_size: int = 1024,
     lr: float = 1e-3,
     log_every: int = 500,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ):
-    # Initialize Weights & Biases for logging
-    wandb.init(
-        project="flow-matching",
-        config={
-            "dataset": dataset_name,
-            "dim": dim,
-            "n_steps": n_steps,
-            "batch_size": batch_size,
-            "lr": lr,
-        }
-    )
+    # # Initialize Weights & Biases for logging
+    # wandb.init(
+    #     project="flow-matching",
+    #     config={
+    #         "dataset": dataset_name,
+    #         "dim": dim,
+    #         "n_steps": n_steps,
+    #         "batch_size": batch_size,
+    #         "lr": lr,
+    #     }
+    # )
 
     # Data
     loader = get_dataloader(name=dataset_name, dim=dim,
@@ -44,7 +44,7 @@ def train(
     model = Denoiser(dim).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     mse = nn.MSELoss()
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_steps, eta_min=0.1*lr)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_steps, eta_min=0.01*lr)
 
     running_loss = 0.0
 
@@ -59,20 +59,24 @@ def train(
 
         x = x.to(device)
 
-        if pred_quantity == "x" and loss_type == "v":
-            t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
-        else:
-            t = torch.rand(1).item()  # t in [0, 1]
+        # if pred_quantity == "x" and loss_type == "v":
+        #     t = torch.rand(1).item() * 0.99 + 0.01  # t in [0.01, 1] to avoid division by zero
+        # else:
+        #     t = torch.rand(1).item()  # t in [0, 1]
         # t = torch.rand(batch_size, device=device)
-        # t_shifted = shift_t(t, base_dim=2, target_dim=dim)  # adjust t for higher dimensions
-        t_tensor = torch.full((batch_size,), t).to(device)
-        t_expand = t_tensor.unsqueeze(-1) 
+
+        # t_tensor = torch.full((batch_size,), t).to(device)
+        # t_expand = t_tensor.unsqueeze(-1) 
+
+        t_tensor = torch.rand(x.shape[0], device=device)
+        t_shifted = shift_t(t_tensor, base_dim=2, target_dim=dim)  # adjust t for higher dimensions
+        t_expand = t_shifted.unsqueeze(-1)
 
         epsilon = torch.randn_like(x)
 
         z_t = (1 - t_expand) * x + t_expand * epsilon
 
-        pred = model(z_t, t_tensor)
+        pred = model(z_t, t_shifted)
         if pred_quantity == "v" and loss_type == "v":
             loss = mse(pred, epsilon - x)
         elif pred_quantity == "v" and loss_type == "x":
@@ -94,11 +98,11 @@ def train(
 
         if step % log_every == 0:
             avg_loss = running_loss / log_every
-            wandb.log({
-                "loss": avg_loss, 
-                "lr": scheduler.get_last_lr()[0], 
-                "step": step,
-            })
+            # wandb.log({
+            #     "loss": avg_loss, 
+            #     "lr": scheduler.get_last_lr()[0], 
+            #     "step": step,
+            # })
             print(f"step {step:>6} / {n_steps} | loss {avg_loss:.4f}")
             running_loss = 0.0
 
@@ -108,4 +112,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="swiss_roll", pred_quantity="x", loss_type="x", dim=2)
+    model = train(dataset_name="swiss_roll", pred_quantity="x", loss_type="x", dim=32)
