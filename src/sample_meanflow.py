@@ -27,11 +27,12 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load("denoiser.pt", map_location="cpu"))
     model.eval()  # switch off dropout/batchnorm training behaviour
     
-    z = sample(model, dim=dim, n_steps=5).numpy()
-    ds = ToyDiffusionDataset(name="swiss_roll", dim=dim)
+    steps = 5
+    z = sample(model, dim=dim, n_steps=steps).numpy()
+    ds = ToyDiffusionDataset(name="circles", dim=dim)
     if dim > 2:
         z = ds.to_2d(z)
 
     plt.scatter(z[:, 0], z[:, 1], s=1, alpha=0.5)
     plt.title("Sample")
-    plt.show()
+    plt.savefig(f"meanflow_plots/circles_{steps}steps.png", dpi=300)

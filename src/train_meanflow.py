@@ -10,7 +10,7 @@ from dataloader import get_dataloader
 def train(
     dataset_name: str = "swiss_roll",
     dim: int = 2,
-    ratio_h: float = 0.5,
+    ratio_h: float = 0.25,
     n_steps: int = 25000,
     batch_size: int = 1024,
     lr: float = 1e-3,
@@ -114,4 +114,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="gaussians", dim=32)
+    model = train(dataset_name="circles", dim=32)
