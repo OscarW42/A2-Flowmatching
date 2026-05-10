@@ -84,7 +84,12 @@ def train(
             u_tgt = v_t - h_expand * dudt
 
         error = u - u_tgt
-        loss = (error ** 2).mean()
+
+        c = 1e-3
+        error_norm = (error.detach() ** 2).mean(dim=-1, keepdim=True)  # (B, 1)
+        w = 1.0 / (error_norm + c)                                      # (B, 1)
+        loss = (w * error ** 2).mean()                                   # scalar
+        #loss = (error ** 2).mean()
 
         optimizer.zero_grad()
         loss.backward()
@@ -109,4 +114,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="swiss_roll", dim=32)
+    model = train(dataset_name="gaussians", dim=32)

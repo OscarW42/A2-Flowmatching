@@ -1,0 +1,28 @@
+{
+  "os":  "Windows-10-10.0.26200-SP0",
+  "python":  "CPython 3.11.15",
+  "startedAt":  "2026-05-10T04:24:58.129712Z",
+  "program":  "c:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching\\src\\train_meanflow.py",
+  "codePath":  "src\\train_meanflow.py",
+  "codePathLocal":  "src\\train_meanflow.py",
+  "git":  {
+    "remote":  "https://github.com/OscarW42/A2-Flowmatching.git",
+    "commit":  "61c3c758e6104588e7f1de3031a54dfbcf89ea79"
+  },
+  "email":  "oscar.bboc@gmail.com",
+  "root":  "C:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching",
+  "host":  "Oscar_laptop",
+  "executable":  "C:\\Users\\oscar\\OneDrive\\Documents\\COMP4680-2\\A2-Flowmatching\\.venv\\Scripts\\python.exe",
+  "cpu_count":  8,
+  "cpu_count_logical":  8,
+  "disk":  {
+    "/":  {
+      "total":  "1021821579264",
+      "used":  "162763796480"
+    }
+  },
+  "memory":  {
+    "total":  "33897037824"
+  },
+  "writerId":  "a4fl8vkob1pc9e9uwxzcmwg9oryx1tba"
+}
