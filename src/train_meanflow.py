@@ -9,8 +9,6 @@ from dataloader import get_dataloader
 # ── Training loop ─────────────────────────────────────────────────────────────
 def train(
     dataset_name: str = "swiss_roll",
-    # pred_quantity: str = "v",  # "x" or "v"
-    # loss_type: str = "v", # "x" or "v"
     dim: int = 2,
     ratio_h: float = 0.5,
     n_steps: int = 25000,
@@ -64,7 +62,6 @@ def train(
         h = t-r
 
         t_tensor = torch.full((batch_size,), t, device=device)
-        # r_tensor = torch.full((batch_size,), r, device=device)
         h_tensor = torch.full((batch_size,), h, device=device)
 
         t_expand = t_tensor.unsqueeze(-1)
@@ -74,11 +71,14 @@ def train(
 
         z_t = (1 - t_expand) * x + t_expand * epsilon
         v_t = epsilon - x
-        u, dudt = torch.func.jvp(
+        xhat, dxdt = torch.func.jvp(
             lambda z, t, h: model(z, t, h),
             (z_t, t_tensor, h_tensor),
             (v_t, torch.ones_like(t_tensor), torch.ones_like(h_tensor)),
         )
+
+        u = epsilon - xhat
+        dudt = -dxdt
 
         with torch.no_grad():
             u_tgt = v_t - h_expand * dudt
@@ -88,6 +88,7 @@ def train(
 
         optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         running_loss += loss.item()
         optimizer.step()
         scheduler.step()
@@ -108,17 +109,4 @@ def train(
     return model
 
 if __name__ == "__main__":
-    model = train(dataset_name="swiss_roll", dim=2)
-
-        # if pred_quantity == "v" and loss_type == "v":
-        #     loss = mse(pred, epsilon - x)
-        # elif pred_quantity == "v" and loss_type == "x":
-        #     x_pred = z_t - t_expand * pred
-        #     loss = mse(x_pred, x)
-        # elif pred_quantity == "x" and loss_type == "x":
-        #     loss = mse(pred, x)
-        # elif pred_quantity == "x" and loss_type == "v":
-        #     v_pred = (z_t - pred) / t_expand
-        #     loss = mse(v_pred, epsilon - x)
-        # else:
-        #     raise ValueError(f"Unknown combination of pred_quantity '{pred_quantity}' and loss_type '{loss_type}'. Choose 'x' or 'v' for both.")
+    model = train(dataset_name="swiss_roll", dim=32)

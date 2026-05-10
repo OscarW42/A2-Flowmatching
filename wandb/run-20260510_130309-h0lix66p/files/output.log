@@ -1,0 +1,29 @@
+step    500 / 25000 | loss 0.4423
+step   1000 / 25000 | loss 0.4453
+step   1500 / 25000 | loss 0.4544
+step   2000 / 25000 | loss 0.4490
+step   2500 / 25000 | loss 0.4292
+step   3000 / 25000 | loss 0.4195
+step   3500 / 25000 | loss 0.4622
+step   4000 / 25000 | loss 0.4397
+step   4500 / 25000 | loss 0.4450
+Traceback (most recent call last):
+  File "c:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\src\train_meanflow.py", line 111, in <module>
+    model = train(dataset_name="swiss_roll", dim=2)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\src\train_meanflow.py", line 51, in train
+    x = next(data_iter)
+        ^^^^^^^^^^^^^^^
+  File "C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\.venv\Lib\site-packages\torch\utils\data\dataloader.py", line 741, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\.venv\Lib\site-packages\torch\utils\data\dataloader.py", line 801, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\.venv\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 54, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\oscar\OneDrive\Documents\COMP4680-2\A2-Flowmatching\.venv\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 54, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

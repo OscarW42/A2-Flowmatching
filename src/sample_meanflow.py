@@ -5,7 +5,7 @@ from meanflow_model import Denoiser
 
 def sample(model, dim=2, n_steps=2, batch_size=8192):
     h = 1.0 / n_steps
-    z = torch.randn(batch_size, dim)
+    z = torch.randn(batch_size, dim)  # z at t=1
     
     for i in range(n_steps):
         t = 1.0 - i * h
@@ -14,14 +14,15 @@ def sample(model, dim=2, n_steps=2, batch_size=8192):
         h_tensor = torch.full((batch_size,), h)
 
         with torch.no_grad():
-            u = model(z, t_tensor, h_tensor)
+            x = model(z, t_tensor, h_tensor)
         
+        u = (z - x)/t
         z = z - h * u
     
     return z
 
 if __name__ == "__main__":
-    dim = 2
+    dim = 32
     model = Denoiser(dim)
     model.load_state_dict(torch.load("denoiser.pt", map_location="cpu"))
     model.eval()  # switch off dropout/batchnorm training behaviour
